@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { CONFIG } from '../utils/constants/config';
 import { TRANSLATIONS } from '../utils/constants/translations';
 

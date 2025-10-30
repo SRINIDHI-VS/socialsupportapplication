@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useState } from 'react';
-import { ChevronLeft, ChevronRight, Check, Save, Globe, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { CONFIG, initialForm } from '../utils/constants/config';
 import { validate } from '../utils/validate';
@@ -16,18 +16,9 @@ const LandingPage: React.FC = () => {
     const { t, isRTL } = useApp();
     const [step, setStep] = useState(1);
     const { form, setForm, saved, clearForm } = useFormPersistence(initialForm);
-    const {
-        apiKey,
-        setApiKey,
-        keyModal,
-        setKeyModal,
-        aiModal,
-        setAiModal,
-        aiLoading,
-        handleAI,
-        saveKey,
-    } = useAIHelper(t);
+    const { apiKey, setApiKey, keyModal, setKeyModal, aiModal, setAiModal, aiLoading, handleAI, saveKey } = useAIHelper(t);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const progress = Math.round((step / CONFIG.STEPS) * 100);
 
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -57,15 +48,14 @@ const LandingPage: React.FC = () => {
         }
     }, [form, step, t, clearForm]);
 
-    const progress = Math.round((step / CONFIG.STEPS) * 100);
 
     return (
         <div
-            className={`min-h-screen w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 bg-[length:400%_400%] animate-gradient-move py-6 px-4 ${isRTL ? 'rtl' : 'ltr'
+            className={`flex-1 min-h-[calc(100vh-130px)] flex items-center justify-center w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 bg-[length:400%_400%] animate-gradient-move px-4 ${isRTL ? 'rtl' : 'ltr'
                 }`}
             dir={isRTL ? 'rtl' : 'ltr'}
         >
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
+            <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
                 <div className="mb-6">
                     <div className="flex justify-between mb-2 text-sm text-gray-600">
                         <span>
@@ -109,7 +99,7 @@ const LandingPage: React.FC = () => {
                     <button
                         onClick={handlePrev}
                         disabled={step === 1}
-                        className="flex items-center gap-2 px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                        className="flex items-center font-bold gap-2 px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                     >
                         <ChevronLeft size={20} /> {t.previous}
                     </button>
@@ -117,16 +107,16 @@ const LandingPage: React.FC = () => {
                     {step < CONFIG.STEPS ? (
                         <button
                             onClick={handleNext}
-                            className="flex items-center px-8 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
+                            className="flex items-center font-bold gap-2 px-8 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
                         >
                             {t.next} <ChevronRight size={20} />
                         </button>
                     ) : (
                         <button
                             onClick={handleSubmit}
-                            className="flex items-center px-5 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
+                            className="flex items-center font-bold px-5 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
                         >
-                            <Check size={20} /> {t.submit}
+                            {t.submit}
                         </button>
                     )}
                 </div>
