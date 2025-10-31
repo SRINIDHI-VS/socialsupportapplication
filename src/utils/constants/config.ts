@@ -1,4 +1,4 @@
-import { FormData } from "../../types/form";
+import { FormData } from '../../types/form';
 export const CONFIG = {
   STORAGE_KEYS: {
     FORM: "form_v1",
@@ -14,22 +14,22 @@ export const CONFIG = {
 } as const;
 
 export const initialForm: FormData = {
-  name: "",
-  nationalId: "",
-  dob: "",
-  gender: "",
-  address: "",
-  city: "",
-  state: "",
-  country: "",
-  phone: "",
-  email: "",
-  maritalStatus: "",
-  dependents: "",
-  employmentStatus: "",
-  monthlyIncome: "",
-  housingStatus: "",
-  financialSituation: "",
-  employmentCircumstances: "",
-  reasonForApplying: "",
+    name: '',
+    nationalId: '',
+    dob: '',
+    gender: '',
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+    phone: '',
+    email: '',
+    maritalStatus: '',
+    dependents: '',
+    employmentStatus: '',
+    monthlyIncome: '',
+    housingStatus: '',
+    financialSituation: '',
+    employmentCircumstances: '',
+    reasonForApplying: '',
 };

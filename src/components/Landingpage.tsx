@@ -11,6 +11,9 @@ import Step3 from '../components/steps/Step3';
 import { useFormPersistence } from '../hooks/useFormPersistence';
 import { useAIHelper } from '../hooks/useAIHelper';
 import { motion, AnimatePresence } from 'framer-motion';
+import Submit from './form/Submit';
+
+type ToastType = 'success' | 'error' | 'warning';
 
 const LandingPage: React.FC = () => {
     const { t, isRTL } = useApp();
@@ -18,6 +21,7 @@ const LandingPage: React.FC = () => {
     const { form, setForm, saved, clearForm } = useFormPersistence(initialForm);
     const { apiKey, setApiKey, keyModal, setKeyModal, aiModal, setAiModal, aiLoading, handleAI, saveKey } = useAIHelper(t);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
     const progress = Math.round((step / CONFIG.STEPS) * 100);
 
     const handleChange = useCallback(
@@ -33,25 +37,35 @@ const LandingPage: React.FC = () => {
         const errs = validate(form, step, t);
         setErrors(errs);
         if (Object.keys(errs).length === 0) setStep((s) => s + 1);
+        else setToast({ message: 'Please fill all required fields!', type: 'warning' });
     }, [form, step, t]);
 
     const handlePrev = useCallback(() => setStep((s) => s - 1), []);
 
-    const handleSubmit = useCallback(() => {
+    const handleSubmit = useCallback(async () => {
         const errs = validate(form, step, t);
         setErrors(errs);
         if (Object.keys(errs).length === 0) {
-            console.log('Submitted:', form);
-            alert(t.successSubmit);
-            clearForm();
-            setStep(1);
+            try {
+                setToast({ message: 'Submitting...', type: 'warning' });
+                await new Promise(res => setTimeout(res, 1500));
+                console.log('Submitted:', form);
+                setToast({ message: t.successSubmit, type: 'success' });
+                clearForm();
+                setStep(1);
+            } catch {
+                setToast({ message: 'Submission failed!', type: 'error' });
+            } finally {
+                setTimeout(() => setToast(null), 4000);
+            }
+        } else {
+            setToast({ message: 'Please fill all required fields!', type: 'warning' });
         }
     }, [form, step, t, clearForm]);
 
-
     return (
         <div
-            className={`flex-1 min-h-[calc(100vh-130px)] flex items-center justify-center w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 bg-[length:400%_400%] animate-gradient-move px-4 ${isRTL ? 'rtl' : 'ltr'
+            className={`flex-1 min-h-[calc(100vh-130px)] flex items-center justify-center w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 bg-[length:400%_400%] animate-gradient-move p-4 ${isRTL ? 'rtl' : 'ltr'
                 }`}
             dir={isRTL ? 'rtl' : 'ltr'}
         >
@@ -68,7 +82,14 @@ const LandingPage: React.FC = () => {
                         )}
                     </div>
                     <div className="mb-6">
-                        <div className="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div
+                            className="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden"
+                            role="progressbar"
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-valuenow={progress}
+                            aria-label="Form progress"
+                        >
                             <div
                                 className="bg-[#021936] h-4 rounded-full transition-[width] duration-500 ease-in-out"
                                 style={{ width: `${progress}%` }}
@@ -106,15 +127,16 @@ const LandingPage: React.FC = () => {
 
                     {step < CONFIG.STEPS ? (
                         <button
+                            onKeyDown={(e) => e.key === 'Enter' && handleNext()}
                             onClick={handleNext}
-                            className="flex items-center font-bold gap-2 px-8 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
+                            className="flex items-center font-bold gap-2 px-8 py-3 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
                         >
                             {t.next} <ChevronRight size={20} />
                         </button>
                     ) : (
                         <button
                             onClick={handleSubmit}
-                            className="flex items-center font-bold px-5 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
+                            className="flex items-center font-bold px-5 py-3 bg-[#021936] text-white rounded-lg hover:bg-[#03204a] transition-all duration-200 active:scale-95"
                         >
                             {t.submit}
                         </button>
@@ -185,6 +207,8 @@ const LandingPage: React.FC = () => {
                     </button>
                 </div>
             </Modal>
+
+            {toast && <Submit message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

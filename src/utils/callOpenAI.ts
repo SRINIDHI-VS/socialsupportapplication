@@ -37,12 +37,16 @@ export const callOpenAI = async (field: string, apiKey: string) => {
     });
 
     clearTimeout(timeout);
-    if (!res.ok) throw new Error("API failed");
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      console.error("OpenAI error:", errData);
+      throw new Error(errData.error?.message || "API failed");
+    }
     const data = await res.json();
     return { ok: true, text: data.choices[0].message.content.trim() };
   } catch (err: any) {
     clearTimeout(timeout);
-    console.warn("⚠️ OpenAI call failed. Using mock response.", err);
+    console.warn("OpenAI call failed. Using mock response.", err);
 
     const mockReplies: Record<string, string> = {
       financialSituation:
